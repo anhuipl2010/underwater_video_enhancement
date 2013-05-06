@@ -1,0 +1,127 @@
+# General-purpose Makefile for C++ programs
+# Author: Vladimir Chernov <2chernov@gmail.com>
+# Last modification date: 07.05.2013
+
+CXX ?= g++
+LINKER ?= g++
+AR ?= ar cr
+LINKER_SO ?= g++ -shared
+
+# package name
+PACKAGE = $(shell basename $(shell pwd))
+
+# platform
+PLATFORM = $(shell uname -s)
+
+# Windows MinGW identifier
+ifeq ($(PLATFORM), MINGW32_NT-5.1)
+	WIN32 = yes
+endif
+ifeq ($(PLATFORM), MINGW32_NT-6.1)
+	WIN32 = yes
+endif
+
+# configuration
+cfg ?= debug
+# debug
+ifeq ($(cfg), debug)
+	CXXFLAGS ?= -g -O0 -Wall -Wextra
+	LDFLAGS ?= -g
+	CPPFLAGS ?= -DDEBUG
+endif
+# release
+ifeq ($(cfg), release)
+	CXXFLAGS ?= -O2 -Wall -Wextra -flto
+	LDFLAGS ?= -O2 -flto -fuse-linker-plugin
+endif
+
+# output and temporary directories
+BIN_DIR = bin/$(cfg)
+OBJ_DIR = obj/$(cfg)
+
+# package specific settings
+-include Makefile.$(PACKAGE)
+-include Makefile.$(PACKAGE).$(PLATFORM)
+
+# output target mode
+MODE ?= exe
+# executable
+ifeq ($(MODE), exe)
+	BIN = $(PACKAGE)
+	ifdef WIN32
+		BIN = $(PACKAGE).exe
+	endif
+endif
+# static library
+ifeq ($(MODE), lib)
+	BIN = lib$(PACKAGE).a
+endif
+# shared object
+ifeq ($(MODE), shared_obj)
+	ifdef WIN32
+		BIN = $(PACKAGE).dll
+	else
+		BIN = lib$(PACKAGE).so
+		CXXFLAGS += -fPIC
+	endif
+endif
+
+OUTPUT = $(BIN_DIR)/$(BIN)
+
+# list of source files
+SRC = $(wildcard *.cpp)
+SRC += $(wildcard $(addsuffix /*.cpp, $(MODULES)))
+
+# list of header files
+HEADERS = $(wildcard *.h)
+HEADERS += $(wildcard $(addsuffix /*.h, $(MODULES)))
+
+OBJ = $(addprefix $(OBJ_DIR)/, $(SRC:.cpp=.o))
+OBJ_SUBDIRS = $(addprefix $(OBJ_DIR)/, $(MODULES))
+
+.PHONY: all clean
+
+all: $(OUTPUT)
+
+$(OUTPUT): $(OBJ) | $(BIN_DIR)
+	@echo "Package: $(PACKAGE)"
+	@echo "Configuration: $(cfg)"
+	@echo "Platform: $(PLATFORM)"
+	@echo "Mode: $(MODE)"
+# executable
+ifeq ($(MODE), exe)
+	$(LINKER) $(LDFLAGS) -o $@ $(OBJ) $(LIBS)
+endif
+# static library
+ifeq ($(MODE), lib)
+	$(AR) $@ $(OBJ)
+endif
+# shared object
+ifeq ($(MODE), shared_obj)
+	$(LINKER_SO) $(LDFLAGS) -o $@ $(OBJ) $(LIBS)
+endif
+	@echo "Finished building target: $@"
+
+# external references
+$(OUTPUT): $(REFS)
+
+# compilation
+$(OBJ_DIR)/%.o: %.cpp
+	@echo "Compiling: $<"
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(INCLUDES) -o $@ -c $<
+
+# recompile if any header was changed
+$(OBJ): $(HEADERS)
+
+# list of all directories without duplicates
+DIRS = $(sort $(OBJ_DIR) $(OBJ_SUBDIRS) $(BIN_DIR))
+
+# make directories
+$(DIRS):
+	mkdir -p $@
+
+$(OBJ): | $(OBJ_DIR) $(OBJ_SUBDIRS)
+$(OBJ_SUBDIRS): | $(OBJ_DIR)
+
+clean:
+	rm -f $(OBJ) $(OUTPUT)
