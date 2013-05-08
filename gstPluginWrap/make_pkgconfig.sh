@@ -9,5 +9,7 @@ OUT_FILE=${pkgconfigdir}/gstPluginWrap.pc
 VERSION=`head -1 VERSION`
 CUR_DIR=`pwd`
 
-echo "$(eval "echo \"$(cat $TEMPLATE_FILE)\"")" > $OUT_FILE
-echo "$OUT_FILE has been created, now you can run \"pkg-config --cflags gstPluginWrap\" and \"pkg-config --libs gstPluginWrap\""
+if echo "$(eval "echo \"$(cat $TEMPLATE_FILE)\"")" > $OUT_FILE; then
+	echo "$OUT_FILE has been created"
+	echo "now you can run \"pkg-config --cflags gstPluginWrap\" and \"pkg-config --libs gstPluginWrap\""
+fi
