@@ -41,6 +41,9 @@ class Customizer;
 
 extern void configure(Customizer*& customizer);
 
+/**
+ * Basic abstract customization class. Should be used as a singleton.
+ */
 class Customizer
 {
 public:
@@ -93,6 +96,11 @@ private:
 	static Customizer* instance;
 };
 
+Customizer* Customizer::instance = NULL;
+
+/**
+ * Plug-in with frame handling.
+ */
 template<class HandlerT>
 class HandlerCustomizer: public Customizer
 {
@@ -107,6 +115,9 @@ public:
 	}
 };
 
+/**
+ * Plug-in with frame handling and properties.
+ */
 template<class HandlerT, class PropT>
 class HandlerAndPropCustomizer: public HandlerCustomizer<HandlerT>
 {
@@ -130,6 +141,9 @@ public:
 	}
 };
 
+/**
+ * Plug-in with frame handling and properties bounded by listener.
+ */
 template<class HandlerT, class PropT>
 class HandlerAndPropWithListenerCustomizer: public HandlerCustomizer<HandlerT>
 {
@@ -162,8 +176,6 @@ public:
 	}
 };
 
-Customizer* Customizer::instance = NULL;
-
 } // namespace gstPluginWrap
 
 G_BEGIN_DECLS // begin C code
@@ -177,7 +189,7 @@ G_BEGIN_DECLS // begin C code
 
 #define GST_PLUGIN_TYPE_CLASS MAKE_CLASS_NAME(GST_PLUGIN_TYPE, Class)
 
-struct _GsThisPlugin
+struct _GstThisPlugin
 {
 	GstElement element;
 	GstPad* sinkPad;
@@ -189,7 +201,7 @@ struct _GsThisPlugin
 	gstPluginWrap::PropertyHolder* propertyHolder;
 };
 
-typedef struct _GsThisPlugin GST_PLUGIN_TYPE;
+typedef struct _GstThisPlugin GST_PLUGIN_TYPE;
 
 struct _GstThisPluginClass
 {

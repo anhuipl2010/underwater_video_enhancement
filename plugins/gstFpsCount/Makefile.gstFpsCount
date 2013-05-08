@@ -1,19 +1,15 @@
 # FPS counter GStreamer plug-in
 
-gstPluginWrap_PATH = ../../gstPluginWrap
-
 MODE = shared_obj
-
-INCLUDES += -I$(gstPluginWrap_PATH)
 
 LIBS += -ltimeutil
 
 CXXFLAGS += -Wno-unused-parameter
 
 ifdef WIN32
-	INCLUDES += `pkg-config --dont-define-prefix --cflags gstreamer-0.10`
-	LIBS += `pkg-config --dont-define-prefix --libs gstreamer-0.10`
+	INCLUDES += `pkg-config --dont-define-prefix --cflags gstPluginWrap`
+	LIBS += `pkg-config --dont-define-prefix --libs gstPluginWrap`
 else
-	INCLUDES += `pkg-config --cflags gstreamer-0.10`
-	LIBS += `pkg-config --libs gstreamer-0.10`
+	INCLUDES += `pkg-config --cflags gstPluginWrap`
+	LIBS += `pkg-config --libs gstPluginWrap`
 endif
