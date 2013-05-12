@@ -42,7 +42,7 @@ class Customizer;
 extern void configure(Customizer*& customizer);
 
 /**
- * Basic abstract customization class. Should be used as a singleton.
+ * Basic customization class. Should be used as a singleton.
  */
 class Customizer
 {
