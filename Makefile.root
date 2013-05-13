@@ -26,13 +26,14 @@ cfg ?= debug
 # debug
 ifeq ($(cfg), debug)
 	CXXFLAGS ?= -g -O0 -Wall -Wextra
-	LDFLAGS ?= -g
+	LDFLAGS ?= -g -O0
 	CPPFLAGS ?= -DDEBUG
 endif
 # release
 ifeq ($(cfg), release)
-	CXXFLAGS ?= -O2 -Wall -Wextra -flto
-	LDFLAGS ?= -O2 -flto -fuse-linker-plugin
+	CXXFLAGS ?= -O2
+	LDFLAGS ?= -O2
+	CPPFLAGS ?= -DNDEBUG
 endif
 
 # output and temporary directories
