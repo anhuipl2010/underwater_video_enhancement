@@ -1,6 +1,6 @@
 # FPS counter GStreamer plug-in
 
-MODE = shared_obj
+mode = shared_obj
 
 LIBS += -ltimeutil
 

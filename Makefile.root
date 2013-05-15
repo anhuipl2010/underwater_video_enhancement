@@ -1,11 +1,17 @@
-# General-purpose Makefile for C++ programs
+# Makefile for C++ projects
 # Author: Vladimir Chernov <2chernov@gmail.com>
-# Last modification date: 07.05.2013
+# Last modification date: 15.05.2013
 
-CXX ?= g++
-LINKER ?= g++
-AR ?= ar cr
-LINKER_SO ?= g++ -shared
+compiler ?= g++
+linker ?= g++
+linker_so ?= g++ -shared
+archiver ?= ar cr
+
+# configuration (debug, release)
+cfg ?= debug
+
+# output target mode (exe, shared_obj, static_lib)
+mode ?= exe
 
 # package name
 PACKAGE = $(shell basename $(shell pwd))
@@ -13,27 +19,25 @@ PACKAGE = $(shell basename $(shell pwd))
 # platform
 PLATFORM = $(shell uname -s)
 
+# debug configuration flags
+ifeq ($(cfg), debug)
+	CXXFLAGS ?= -g -O0 -Wall -Wextra
+	LDFLAGS ?= -g -O0
+	CPPFLAGS ?= -DDEBUG
+endif
+# release configuration flags
+ifeq ($(cfg), release)
+	CXXFLAGS ?= -O2
+	LDFLAGS ?= -O2
+	CPPFLAGS ?= -DNDEBUG
+endif
+
 # Windows MinGW identifier
 ifeq ($(PLATFORM), MINGW32_NT-5.1)
 	WIN32 = yes
 endif
 ifeq ($(PLATFORM), MINGW32_NT-6.1)
 	WIN32 = yes
-endif
-
-# configuration
-cfg ?= debug
-# debug
-ifeq ($(cfg), debug)
-	CXXFLAGS ?= -g -O0 -Wall -Wextra
-	LDFLAGS ?= -g -O0
-	CPPFLAGS ?= -DDEBUG
-endif
-# release
-ifeq ($(cfg), release)
-	CXXFLAGS ?= -O2
-	LDFLAGS ?= -O2
-	CPPFLAGS ?= -DNDEBUG
 endif
 
 # output and temporary directories
@@ -44,27 +48,25 @@ OBJ_DIR = obj/$(cfg)
 -include Makefile.$(PACKAGE)
 -include Makefile.$(PACKAGE).$(PLATFORM)
 
-# output target mode
-MODE ?= exe
-# executable
-ifeq ($(MODE), exe)
+# executable mode
+ifeq ($(mode), exe)
 	BIN = $(PACKAGE)
 	ifdef WIN32
 		BIN = $(PACKAGE).exe
 	endif
 endif
-# static library
-ifeq ($(MODE), lib)
-	BIN = lib$(PACKAGE).a
-endif
-# shared object
-ifeq ($(MODE), shared_obj)
+# shared object mode
+ifeq ($(mode), shared_obj)
 	ifdef WIN32
 		BIN = $(PACKAGE).dll
 	else
 		BIN = lib$(PACKAGE).so
 		CXXFLAGS += -fPIC
 	endif
+endif
+# static library mode
+ifeq ($(mode), static_lib)
+	BIN = lib$(PACKAGE).a
 endif
 
 OUTPUT = $(BIN_DIR)/$(BIN)
@@ -86,30 +88,30 @@ all: $(OUTPUT)
 
 $(OUTPUT): $(OBJ) | $(BIN_DIR)
 	@echo "Package: $(PACKAGE)"
-	@echo "Configuration: $(cfg)"
 	@echo "Platform: $(PLATFORM)"
-	@echo "Mode: $(MODE)"
+	@echo "Configuration: $(cfg)"
+	@echo "Mode: $(mode)"
 # executable
-ifeq ($(MODE), exe)
-	$(LINKER) $(LDFLAGS) -o $@ $(OBJ) $(LIBS)
-endif
-# static library
-ifeq ($(MODE), lib)
-	$(AR) $@ $(OBJ)
+ifeq ($(mode), exe)
+	$(linker) -o $@ $(OBJ) $(LDFLAGS) $(LIBS)
 endif
 # shared object
-ifeq ($(MODE), shared_obj)
-	$(LINKER_SO) $(LDFLAGS) -o $@ $(OBJ) $(LIBS)
+ifeq ($(mode), shared_obj)
+	$(linker_so) -o $@ $(OBJ) $(LDFLAGS) $(LIBS)
+endif
+# static library
+ifeq ($(mode), static_lib)
+	$(archiver) $@ $(OBJ)
 endif
 	@echo "Finished building target: $@"
 
-# external references
-$(OUTPUT): $(REFS)
+# dependencies (forces relinking if referenced libraries was changed)
+$(OUTPUT): $(DEPS)
 
 # compilation
 $(OBJ_DIR)/%.o: %.cpp
 	@echo "Compiling: $<"
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(INCLUDES) -o $@ -c $<
+	$(compiler) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -o $@ -c $<
 
 # recompile if any header was changed
 $(OBJ): $(HEADERS)

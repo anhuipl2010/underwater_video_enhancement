@@ -1,6 +1,6 @@
 # Median filter GStreamer plug-in
 
-MODE = shared_obj
+mode = shared_obj
 
 CXXFLAGS += -Wno-unused-parameter
 
