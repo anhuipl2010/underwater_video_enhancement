@@ -20,7 +20,7 @@ const char* description = "Performs median filtering.";
 const char* originUrl = "https://github.com/vchernov/gstAssist";
 const char* author = "Vladimir Chernov <vladimir.chernov@student.uva.fi>";
 const char* license = "LGPL";
-const char* version = "0.1";
+const char* version = "0.2";
 } // details
 
 const char* allowedCaps = "video/x-raw-yuv, format=(fourcc)I420; "
@@ -33,7 +33,16 @@ class MedianFilterProperties: public gstPluginWrap::ImagePropertyHolder
 public:
 	enum Arguments
 	{
-		ARG_RADIUS = 1,
+		ARG_RADIUS_CH1 = 1,
+		ARG_RADIUS_CH2,
+		ARG_RADIUS_CH3,
+	};
+
+	enum ColorSpace
+	{
+		CS_UNKNOWN,
+		CS_YUV,
+		CS_RGB,
 	};
 
 	static const int defaultRadius;
@@ -48,9 +57,8 @@ public:
 	bool set(guint id, const GValue* val);
 	bool get(guint id, GValue* val);
 
-	int radius;
-
-	int imgType;
+	int radius[3];
+	ColorSpace colorSpace;
 };
 
 class MedianFilter: public gstPluginWrap::FrameHandler<MedianFilterProperties>
