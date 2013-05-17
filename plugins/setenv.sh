@@ -6,6 +6,7 @@ export GST_PLUGIN_PATH=$(eval ../scripts/pluginPathAdd.py \
 gstFpsCount/bin/release \
 gstMedianFilter/bin/release \
 gstUnsharpMask/bin/release \
+gstColorTuning/bin/release \
 )
 
 echo "GST_PLUGIN_PATH value:"

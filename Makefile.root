@@ -50,9 +50,10 @@ OBJ_DIR = obj/$(cfg)
 
 # executable mode
 ifeq ($(mode), exe)
-	BIN = $(PACKAGE)
 	ifdef WIN32
 		BIN = $(PACKAGE).exe
+	else
+		BIN = $(PACKAGE)
 	endif
 endif
 # shared object mode
