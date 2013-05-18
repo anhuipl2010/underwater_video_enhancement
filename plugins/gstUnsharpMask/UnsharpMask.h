@@ -20,7 +20,7 @@ const char* description = "Performs unsharp mask filtering.";
 const char* originUrl = "https://github.com/vchernov/gstAssist";
 const char* author = "Vladimir Chernov <vladimir.chernov@student.uva.fi>";
 const char* license = "LGPL";
-const char* version = "0.1";
+const char* version = "0.2";
 } // namespace details
 
 const char* allowedCaps = "video/x-raw-yuv, format=(fourcc)I420; "
@@ -33,14 +33,29 @@ class UnsharpMaskProperties: public gstPluginWrap::ImagePropertyHolder
 public:
 	enum Arguments
 	{
-		ARG_SIGMA = 1,
-		ARG_ALPHA,
-		ARG_BETA,
+		ARG_RADIUS_CH1 = 1,
+		ARG_AMOUNT_CH1,
+		ARG_RADIUS_CH2,
+		ARG_AMOUNT_CH2,
+		ARG_RADIUS_CH3,
+		ARG_AMOUNT_CH3,
 	};
 
-	static const double defaultSigma;
-	static const double defaultAlpha;
-	static const double defaultBeta;
+	enum ColorSpace
+	{
+		CS_UNKNOWN,
+		CS_YUV,
+		CS_RGB,
+	};
+
+	struct ChannelParam
+	{
+		double radius;
+		double amount;
+	};
+
+	static const double defaultRadius;
+	static const double defaultAmount;
 
 	static void getParameters(gstPluginWrap::ParamIdSpecMap& parameters);
 
@@ -52,11 +67,8 @@ public:
 
 	void setMediaInfo(gchar* mime, GstStructure* params);
 
-	double sigma;
-	double alpha;
-	double beta;
-
-	int imgType;
+	ChannelParam channels[3];
+	ColorSpace colorSpace;
 };
 
 class UnsharpMask:
@@ -72,7 +84,15 @@ public:
 	void process(uint8_t* buffer);
 
 private:
-	cv::Mat blurred;
+	struct ChannelData
+	{
+		int offset;
+		int width;
+		int height;
+		cv::Mat blurred;
+	};
+
+	ChannelData channelsData[3];
 };
 
 #endif // UNSHARPMASK_H_
