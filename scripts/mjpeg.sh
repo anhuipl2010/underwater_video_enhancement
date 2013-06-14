@@ -11,10 +11,10 @@ else
 	scale="video/x-raw-yuv"
 fi
 
-gst-launch filesrc location=$file ! \
+gst-launch filesrc location="$file" ! \
 multipartdemux ! jpegdec ! \
 queue ! \
-videorate ! "video/x-raw-yuv,framerate=(fraction)$fps" ! \
+videorate ! "video/x-raw-yuv, framerate=(fraction)$fps" ! \
 queue ! \
 videoscale ! $scale ! \
 xvimagesink
