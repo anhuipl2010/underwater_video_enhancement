@@ -21,4 +21,4 @@ Copying
 
 Free use of this software is granted under the terms of the GNU Lesser General Public License 
 version 3 or later (LGPLv3+). For details see the files `COPYING` and `COPYING.LESSER` included 
-with the timeutil distribution.
+with the gstPluginWrap distribution.
