@@ -4,34 +4,47 @@
 #include <getopt.h>
 #include <ctime>
 #include <stdio.h>
+#include <string.h>
 
 #include "filesys.h"
+
+void printUsageHelp(char** argv)
+{
+	std::cout << "usage: " << argv[0] << " -s script [-p pattern] [-l] [directories ...]\n";
+	std::cout << "\t-s script:  path to program that will be run for each file found\n";
+	std::cout << "\t-p pattern:  wildcard search pattern for files to be processed\n";
+	std::cout << "\t\t(\"*\" by default)\n";
+	std::cout << "\t-l:  enable log\n";
+	std::cout << "\tdirectories:  list of directories that should be scanned for files\n";
+	std::cout << "\t\t(the current directory by default)\n";
+	std::cout << std::flush;
+}
 
 int main(int argc, char** argv)
 {
 	std::string script;
-	std::string pattern; // wildcard pattern for input files
+	std::string pattern = "*"; // wildcard pattern for input files
 	std::vector<std::string> dirs; // directories to be processed
+	bool logEnabled = false;
 
 	while (true)
 	{
-		int opt = getopt(argc, argv, "-hs:p:");
+		int opt = getopt(argc, argv, "-hs:p:l");
 		if (opt == -1)
 			break;
 		switch (opt)
 		{
 		case 'h': // help
-			std::cout << "usage: " << argv[0] << " -s script -p pattern [directory ...]\n";
-			std::cout << "\tscript: path to program that will be run for each file found\n";
-			std::cout << "\tpattern: wildcard search pattern for files to be processed\n";
-			std::cout << "\tdirectory: directory that should be scanned for files\n";
-			std::cout << std::flush;
+			printUsageHelp(argv);
 			return 0;
 		case 's': // script
 			script = optarg;
 			break;
 		case 'p': // pattern
 			pattern = optarg;
+			break;
+		case 'l':
+			logEnabled = true;
 			break;
 		case '\1': // no option
 			dirs.push_back(optarg);
@@ -42,49 +55,73 @@ int main(int argc, char** argv)
 		}
 	}
 
-	if (!fileExists(script))
+	if (script.empty())
 	{
-		std::cerr << "script file does not exist" << std::endl;
+		std::cerr << "The script argument cannot be empty." << std::endl;
+		printUsageHelp(argv);
 		return 1;
 	}
+
+	if (dirs.empty())
+		dirs.push_back("."); // add current directory by default
 
 	std::cout << "start batch processing" << std::endl;
 
 	std::vector<std::string> files;
 	getFiles(dirs, pattern, files);
 	std::cout << files.size() << " files found" << std::endl;
+
+	int num = 1;
 	for (std::vector<std::string>::iterator it = files.begin(), end = files.end(); it != end; ++it)
 	{
 		std::string fn = *it;
 
 		// command to launch
 		char cmd[1024];
-		sprintf(cmd, "%s \"%s\"", script.c_str(), fn.c_str());
+		sprintf(cmd, "%s \"%s\" 2>&1", script.c_str(), fn.c_str());
 
-		std::string logFileName = fn + ".log";
-		FILE* logFile = fopen(logFileName.c_str(), "wt");
+		FILE* logFile = NULL;
+		if (logEnabled)
+		{
+			std::string logFileName = fn + ".log";
+			logFile = fopen(logFileName.c_str(), "wt");
+			if (logFile != NULL)
+			{
+				fwrite(cmd, 1, strlen(cmd), logFile);
+				fputc('\n', logFile);
+			}
+			else
+				std::cerr << "cannot open log file: " << logFileName << std::endl;
+		}
 
-		std::cout << "run: " << fn << std::flush;
+		std::cout << "#" << num << " run: " << cmd << std::endl;
 		time_t startTime = std::time(NULL);
-
 		FILE* proc = popen(cmd, "r"); // starting the process
 
-		// wait while finish, logging output messages from script
+		// wait while finish, read output messages from the process
 		char outputBuffer[4096];
 		size_t readLen;
 		while ((readLen = fread(outputBuffer, 1, sizeof(outputBuffer), proc)) != 0)
-			fwrite(outputBuffer, 1, readLen, logFile);
-		fclose(logFile);
+		{
+			std::cout << outputBuffer << std::flush;
+			if (logFile != NULL)
+				fwrite(outputBuffer, 1, readLen, logFile);
+		}
+
+		if (logFile != NULL)
+			fclose(logFile);
 
 		int retCode = pclose(proc); // stopping the process
-
 		time_t endTime = std::time(NULL);
+
+		std::cout << "#" << num;
 		if (retCode == 0)
 			std::cout << " complete";
 		else
 			std::cout << " fail (error code " << retCode << ")";
 		std::cout << " " << (endTime - startTime) << " sec";
 		std::cout << std::endl;
+		num++;
 	}
 
 	std::cout << "batch processing is finished" << std::endl;
