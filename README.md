@@ -1,4 +1,4 @@
 gstAssist
 =========
 
-GStreamer assistant stuff. Plug-in wrapper library. Image processing plug-ins, useful scripts.
+GStreamer assistant stuff: plug-in wrapper library; Image Processing plug-ins; useful scripts.
