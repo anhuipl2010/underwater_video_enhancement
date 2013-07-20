@@ -1,55 +1,92 @@
 #include "filesys.h"
 
-#include <fnmatch.h>
-#include <fts.h>
+#include <iostream>
+#include <deque>
 #include <errno.h>
 #include <string.h>
-#include <iostream>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
-void getFiles(const std::string& dir, const std::string& pattern, std::vector<std::string>& files)
+void getFiles(const std::string& directory, const std::string& pattern,
+              std::vector<std::string>& files)
 {
 	std::vector<std::string> dirs;
-	dirs.push_back(dir);
+	dirs.push_back(directory);
 	getFiles(dirs, pattern, files);
 }
 
-void getFiles(const std::vector<std::string>& dirs, const std::string& pattern, std::vector<std::string>& files)
+void getFiles(const std::vector<std::string>& directories, const std::string& pattern,
+              std::vector<std::string>& files)
 {
-	if (dirs.empty())
-		return;
+	const std::string pathSep = "/"; // OK for Windows too
 
-	const size_t dirsCntMax = 8;
-	char* paths[dirsCntMax + 1];
-
-	size_t dirsCnt = dirs.size();
-	if (dirsCnt > dirsCntMax)
+	std::deque<std::string> dirs(directories.begin(), directories.end());
+	while (!dirs.empty())
 	{
-		std::cerr << "Too many directories passed to ";
-		std::cerr << __FUNCTION__ << " function: " << dirsCnt;
-		std::cerr << ". Only first " << dirsCntMax << " will be scanned.";
-		std::cerr << std::endl;
+		std::string curDir = dirs.front();
+		dirs.pop_front();
 
-		dirsCnt = dirsCntMax;
-	}
-
-	size_t ind = 0;
-	for (; ind < dirsCnt; ind++)
-		paths[ind] = const_cast<char*> (dirs[ind].c_str()); // should be ok with fts_open
-	paths[ind] = NULL;
-
-	FTS* tree = fts_open(paths, FTS_NOCHDIR, NULL);
-	FTSENT* node;
-	while ((node = fts_read(tree)) != NULL)
-	{
-		if (node->fts_errno != 0)
+		DIR* handle = opendir(curDir.c_str());
+		if (handle == NULL)
 		{
-			std::cerr << "fts_read \"" << node->fts_accpath << "\" error " << node->fts_errno;
-			std::cerr << ": " << strerror(node->fts_errno);
-			std::cerr << std::endl;
+			std::cerr << "cannot open directory: " << curDir << std::endl;
 			continue;
 		}
-		if ((node->fts_info & FTS_F) != 0 && fnmatch(pattern.c_str(), node->fts_name, 0) == 0)
-			files.push_back(node->fts_accpath);
+
+		dirent* entry;
+		while ((entry = readdir(handle)) != NULL)
+		{
+			std::string path = curDir + pathSep + entry->d_name;
+
+			struct stat fileStat;
+			stat(path.c_str(), &fileStat);
+			if (S_ISDIR(fileStat.st_mode))
+			{
+				if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+					dirs.push_back(path);
+			}
+			else
+			{
+				if (matchWildcard(pattern.c_str(), entry->d_name))
+					files.push_back(path);
+			}
+		}
 	}
-	fts_close(tree);
+}
+
+bool matchWildcard(const char* pattern, const char* str)
+{
+	while (true)
+	{
+		const char c = *pattern++;
+		switch (c)
+		{
+		case '\0':
+			return (*str == '\0');
+			break;
+		case '\\':
+			if (*pattern == '\0' || *str++ != *pattern++)
+				return false;
+			break;
+		case '?':
+			if (*str++ == '\0')
+				return false;
+			break;
+		case '*':
+			while (*pattern == '*')
+				++pattern;
+			if (*pattern == '\0')
+				return true;
+			while (*str != '\0')
+				if (matchWildcard(pattern, str++))
+					return true;
+			return false;
+			break;
+		default:
+			if (*str++ != c)
+				return false;
+			break;
+		}
+	}
 }
