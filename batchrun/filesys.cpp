@@ -39,9 +39,10 @@ void getFiles(const std::vector<std::string>& directories, const std::string& pa
 		{
 			std::string path = curDir + pathSep + entry->d_name;
 
+			// check is it a directory or a regular file
 			struct stat fileStat;
 			stat(path.c_str(), &fileStat);
-			if (S_ISDIR(fileStat.st_mode))
+			if (S_ISDIR(fileStat.st_mode)) // there is no entry->d_type on MinGW
 			{
 				if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
 					dirs.push_back(path);
@@ -52,6 +53,8 @@ void getFiles(const std::vector<std::string>& directories, const std::string& pa
 					files.push_back(path);
 			}
 		}
+
+		closedir(handle);
 	}
 }
 
@@ -89,4 +92,5 @@ bool matchWildcard(const char* pattern, const char* str)
 			break;
 		}
 	}
+	return false;
 }
