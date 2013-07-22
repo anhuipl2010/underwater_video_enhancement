@@ -144,8 +144,9 @@ int main(int argc, char** argv)
 		// wait while finish, read output messages from the process
 		char outputBuffer[4096];
 		size_t readLen;
-		while ((readLen = fread(outputBuffer, 1, sizeof(outputBuffer), proc)) != 0)
+		while ((readLen = fread(outputBuffer, 1, sizeof(outputBuffer) - 1, proc)) != 0)
 		{
+			outputBuffer[readLen] = '\0';
 			std::cout << outputBuffer << std::flush;
 			if (logFile != NULL)
 				fwrite(outputBuffer, 1, readLen, logFile);

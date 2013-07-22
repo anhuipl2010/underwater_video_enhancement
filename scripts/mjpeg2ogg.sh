@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [ "$#" -lt 1 ]; then
-  echo "usage: `basename $0` input_file [output_file fps]" >&2
+  echo "usage: `basename $0` input_file [output_file] [fps]" >&2
   exit 1
 fi
 
