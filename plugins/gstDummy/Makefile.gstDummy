@@ -1,0 +1,13 @@
+# Dummy GStreamer plug-in
+
+mode = shared_obj
+
+CXXFLAGS += -Wno-unused-parameter
+
+ifdef WIN32
+	INCLUDES += `pkg-config --dont-define-prefix --cflags gstPluginWrap`
+	LIBS += `pkg-config --dont-define-prefix --libs gstPluginWrap`
+else
+	INCLUDES += `pkg-config --cflags gstPluginWrap`
+	LIBS += `pkg-config --libs gstPluginWrap`
+endif
