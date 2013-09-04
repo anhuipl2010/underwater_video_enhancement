@@ -1,4 +1,5 @@
 #!/bin/sh
+# plays MJPEG (Motion JPEG) video files
 
 file=$1
 
