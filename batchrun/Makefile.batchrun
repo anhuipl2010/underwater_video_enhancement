@@ -1,0 +1,9 @@
+# batchrun
+
+ifdef WIN32
+ifeq ($(cfg), release)
+	# static link with standard library on Windows 
+	# in order to avoid conflict with libstdc++-6.dll
+	LDFLAGS += -static-libstdc++
+endif
+endif
