@@ -1,9 +1,17 @@
-#!/bin/sh
+#!/bin/bash
 
-# use "source" (or ".") command in order to set up environment variables for current shell
+# use "source" (or ".") command in order to set up 
+# environment variable for current shell
 
-export GST_PLUGIN_PATH=$(eval ../scripts/pluginPathAdd.py bin)
+script=$(readlink -f $BASH_SOURCE)
+script_dir=$(dirname $script)
+pathadd=$script_dir/../pathadd/bin/release/pathadd
 
-echo "GST_PLUGIN_PATH value:"
-echo $GST_PLUGIN_PATH
+
+export GST_PLUGIN_PATH=$(eval $pathadd \
+GST_PLUGIN_PATH \
+$script_dir/bin \
+)
+
+echo "GST_PLUGIN_PATH="$GST_PLUGIN_PATH
 
