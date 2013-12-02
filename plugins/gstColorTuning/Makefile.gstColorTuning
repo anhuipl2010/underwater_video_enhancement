@@ -2,12 +2,11 @@
 
 mode = shared_obj
 
-CXXFLAGS += -Wno-unused-parameter
+CXXFLAGS += -Wno-unused-parameter -Wno-unused-local-typedefs
 
-ifdef WIN32
-	INCLUDES += `pkg-config --dont-define-prefix --cflags gstPluginWrap`
-	LIBS += `pkg-config --dont-define-prefix --libs gstPluginWrap`
-else
-	INCLUDES += `pkg-config --cflags gstPluginWrap`
-	LIBS += `pkg-config --libs gstPluginWrap`
+INCLUDES += `pkg-config --cflags gstPluginWrap`
+LIBS += `pkg-config --libs gstPluginWrap`
+
+ifeq ($(cfg), release)
+	BIN_DIR = ../bin
 endif

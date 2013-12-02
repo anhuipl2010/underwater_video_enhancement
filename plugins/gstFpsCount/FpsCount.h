@@ -7,11 +7,9 @@
 
 #include <gstPluginWrap.h>
 
-namespace gstPluginWrap
-{
+namespace gstPluginWrap {
 
-namespace details
-{
+namespace details {
 const char* name = "fpscount";
 const char* longName = "FPS counter";
 const char* classification = "Generic";
@@ -26,16 +24,15 @@ const char* allowedCaps = "ANY";
 
 } // namespace gstPluginWrap
 
-class FpsCount: public gstPluginWrap::PureFrameHandler
-{
+class FpsCount: public gstPluginWrap::PureFrameHandler {
 public:
-	FpsCount();
-	virtual ~FpsCount();
+    FpsCount();
+    virtual ~FpsCount();
 
-	void process(uint8_t* buffer);
+    void process(uint8_t* buffer);
 
 private:
-	timeutil::FpsCounter fpsCounter;
+    timeutil::FpsCounter fpsCounter;
 };
 
 #endif // FPSCOUNT_H_

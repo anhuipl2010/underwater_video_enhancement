@@ -2,18 +2,14 @@
 
 mode = shared_obj
 
-CXXFLAGS += -Wno-unused-parameter
+CXXFLAGS += -Wno-unused-parameter -Wno-unused-local-typedefs
 
-ifdef WIN32
-	INCLUDES += `pkg-config --dont-define-prefix --cflags gstPluginWrap`
-	LIBS += `pkg-config --dont-define-prefix --libs gstPluginWrap`
-	
-	INCLUDES += `pkg-config --dont-define-prefix --cflags opencv`
-	LIBS += `pkg-config --dont-define-prefix --libs opencv`
-else
-	INCLUDES += `pkg-config --cflags gstPluginWrap`
-	LIBS += `pkg-config --libs gstPluginWrap`
-	
-	INCLUDES += `pkg-config --cflags opencv`
-	LIBS += `pkg-config --libs opencv`
+INCLUDES += `pkg-config --cflags gstPluginWrap`
+LIBS += `pkg-config --libs gstPluginWrap`
+
+INCLUDES += `pkg-config --cflags opencv`
+LIBS += `pkg-config --libs opencv`
+
+ifeq ($(cfg), release)
+	BIN_DIR = ../bin
 endif

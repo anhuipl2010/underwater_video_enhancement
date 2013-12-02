@@ -1,18 +1,18 @@
 /*
  * Copyright (C) 2013 Vladimir Chernov
- * 
+ *
  * This file is part of gstPluginWrap library.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -25,8 +25,7 @@
 
 #include <gst/gst.h>
 
-namespace gstPluginWrap
-{
+namespace gstPluginWrap {
 
 /**
  * Parameter id-specification map.
@@ -37,106 +36,83 @@ typedef std::map<guint, GParamSpec*> ParamIdSpecMap;
 /**
  * Class for notification of property changes.
  */
-class PropertyListener
-{
+class PropertyListener {
 public:
-	virtual ~PropertyListener()
-	{
-	}
+    virtual ~PropertyListener() {}
 
-	virtual void propertyChanged(guint id)
-	{
-	}
-
-	virtual void mediaInfoChanged()
-	{
-	}
+    virtual void propertyChanged(guint id) {}
+    virtual void mediaInfoChanged() {}
 };
 
 /**
  * Holder of properties.
  */
-class PropertyHolder
-{
+class PropertyHolder {
 public:
-	PropertyHolder()
-	{
-		listener = NULL;
-	}
+    PropertyHolder() {
+        listener = NULL;
+    }
 
-	virtual ~PropertyHolder()
-	{
-	}
+    virtual ~PropertyHolder() {}
 
-	void setListener(PropertyListener* listener)
-	{
-		this->listener = listener;
-		if (listener != NULL)
-		{
-			for (std::set<guint>::iterator it = initialParamIds.begin(), end = initialParamIds.end(); it != end; ++it)
-			{
-				guint id = *it;
-				listener->propertyChanged(id);
-			}
-		}
-	}
+    void setListener(PropertyListener* listener) {
+        this->listener = listener;
+        if (listener != NULL) {
+            for (std::set<guint>::iterator it = initialParamIds.begin(), end = initialParamIds.end();
+                    it != end; ++it) {
+                guint id = *it;
+                listener->propertyChanged(id);
+            }
+        }
+    }
 
-	PropertyListener* getListener() const
-	{
-		return listener;
-	}
+    PropertyListener* getListener() const {
+        return listener;
+    }
 
-	virtual void setMediaInfo(gchar* mime, GstStructure* params)
-	{
-		if (listener != NULL)
-			listener->mediaInfoChanged();
-	}
+    virtual void setMediaInfo(gchar* mime, GstStructure* params) {
+        if (listener != NULL)
+            listener->mediaInfoChanged();
+    }
 
-	virtual bool set(guint id, const GValue* val)
-	{
-		if (listener != NULL)
-			listener->propertyChanged(id);
-		return true;
-	}
+    virtual bool set(guint id, const GValue* val) {
+        if (listener != NULL)
+            listener->propertyChanged(id);
+        return true;
+    }
 
-	virtual bool get(guint id, GValue* val)
-	{
-		return true;
-	}
+    virtual bool get(guint id, GValue* val) {
+        return true;
+    }
 
 protected:
-	std::set<guint> initialParamIds; // parameters that will be notified right after frame handler creation
+    std::set<guint> initialParamIds; // parameters that will be notified right after frame handler creation
 
 private:
-	PropertyListener* listener;
+    PropertyListener* listener;
 };
 
 /**
  * Holder of image frame properties.
  */
-class ImagePropertyHolder: public PropertyHolder
-{
+class ImagePropertyHolder: public PropertyHolder {
 public:
-	ImagePropertyHolder()
-	{
-		bufferWidth = 0;
-		bufferHeight = 0;
-	}
+    ImagePropertyHolder() {
+        bufferWidth = 0;
+        bufferHeight = 0;
+    }
 
-	virtual ~ImagePropertyHolder()
-	{
-	}
+    virtual ~ImagePropertyHolder() {}
 
-	virtual void setMediaInfo(gchar* mime, GstStructure* params)
-	{
-		gst_structure_get_int(params, "width", &bufferWidth);
-		gst_structure_get_int(params, "height", &bufferHeight);
+    virtual void setMediaInfo(gchar* mime, GstStructure* params) {
+        gst_structure_get_int(params, "width", &bufferWidth);
+        gst_structure_get_int(params, "height", &bufferHeight);
 
-		PropertyHolder::setMediaInfo(mime, params);
-	}
+        PropertyHolder::setMediaInfo(mime, params);
+    }
 
-	int bufferWidth;
-	int bufferHeight;
+    int bufferWidth;
+    int bufferHeight;
 };
 
 } // namespace gstPluginWrap

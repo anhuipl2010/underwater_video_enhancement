@@ -1,5 +1,5 @@
 Name: gstPluginWrap
-Description: A C++ wrapper over GStreamer that simplifies writing plug-ins. 
+Description: A C++ wrapper over GStreamer for plug-in development.
 Requires: gstreamer-0.10
 Version: $VERSION
 Libs:

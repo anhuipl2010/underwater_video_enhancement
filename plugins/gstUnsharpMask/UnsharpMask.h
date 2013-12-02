@@ -8,11 +8,9 @@
 
 #include <gstPluginWrap.h>
 
-namespace gstPluginWrap
-{
+namespace gstPluginWrap {
 
-namespace details
-{
+namespace details {
 const char* name = "unsharpmask";
 const char* longName = "Unsharp Mask filter";
 const char* classification = "Generic/Filter";
@@ -24,75 +22,69 @@ const char* version = "0.2";
 } // namespace details
 
 const char* allowedCaps = "video/x-raw-yuv, format=(fourcc)I420; "
-	"video/x-raw-rgb, bpp=32, depth=24";
+                          "video/x-raw-rgb, bpp=32, depth=24";
 
 } // namespace gstPluginWrap
 
-class UnsharpMaskProperties: public gstPluginWrap::ImagePropertyHolder
-{
+class UnsharpMaskProperties: public gstPluginWrap::ImagePropertyHolder {
 public:
-	enum Arguments
-	{
-		ARG_RADIUS_CH1 = 1,
-		ARG_AMOUNT_CH1,
-		ARG_RADIUS_CH2,
-		ARG_AMOUNT_CH2,
-		ARG_RADIUS_CH3,
-		ARG_AMOUNT_CH3,
-	};
+    enum Arguments {
+        ARG_RADIUS_CH1 = 1,
+        ARG_AMOUNT_CH1,
+        ARG_RADIUS_CH2,
+        ARG_AMOUNT_CH2,
+        ARG_RADIUS_CH3,
+        ARG_AMOUNT_CH3,
+    };
 
-	enum ColorSpace
-	{
-		CS_UNKNOWN,
-		CS_YUV,
-		CS_RGB,
-	};
+    enum ColorSpace {
+        CS_UNKNOWN,
+        CS_YUV,
+        CS_RGB,
+    };
 
-	struct ChannelParam
-	{
-		double radius;
-		double amount;
-	};
+    struct ChannelParam {
+        double radius;
+        double amount;
+    };
 
-	static const double defaultRadius;
-	static const double defaultAmount;
+    static const double defaultRadius;
+    static const double defaultAmount;
 
-	static void getParameters(gstPluginWrap::ParamIdSpecMap& parameters);
+    static void getParameters(gstPluginWrap::ParamIdSpecMap& parameters);
 
-	UnsharpMaskProperties();
-	virtual ~UnsharpMaskProperties();
+    UnsharpMaskProperties();
+    virtual ~UnsharpMaskProperties();
 
-	bool set(guint id, const GValue* val);
-	bool get(guint id, GValue* val);
+    bool set(guint id, const GValue* val);
+    bool get(guint id, GValue* val);
 
-	void setMediaInfo(gchar* mime, GstStructure* params);
+    void setMediaInfo(gchar* mime, GstStructure* params);
 
-	ChannelParam channels[3];
-	ColorSpace colorSpace;
+    ChannelParam channels[3];
+    ColorSpace colorSpace;
 };
 
 class UnsharpMask:
-	public gstPluginWrap::FrameHandler<UnsharpMaskProperties>,
-	public gstPluginWrap::PropertyListener
-{
+    public gstPluginWrap::FrameHandler<UnsharpMaskProperties>,
+    public gstPluginWrap::PropertyListener {
 public:
-	UnsharpMask();
-	virtual ~UnsharpMask();
+    UnsharpMask();
+    virtual ~UnsharpMask();
 
-	void mediaInfoChanged();
+    void mediaInfoChanged();
 
-	void process(uint8_t* buffer);
+    void process(uint8_t* buffer);
 
 private:
-	struct ChannelData
-	{
-		int offset;
-		int width;
-		int height;
-		cv::Mat blurred;
-	};
+    struct ChannelData {
+        int offset;
+        int width;
+        int height;
+        cv::Mat blurred;
+    };
 
-	ChannelData channelsData[3];
+    ChannelData channelsData[3];
 };
 
 #endif // UNSHARPMASK_H_

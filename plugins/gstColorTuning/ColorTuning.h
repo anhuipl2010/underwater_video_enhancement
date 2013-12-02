@@ -5,11 +5,9 @@
 
 #include <gstPluginWrap.h>
 
-namespace gstPluginWrap
-{
+namespace gstPluginWrap {
 
-namespace details
-{
+namespace details {
 const char* name = "colortuning";
 const char* longName = "Color tuning filter";
 const char* classification = "Generic/Filter";
@@ -24,47 +22,44 @@ const char* allowedCaps = "video/x-raw-yuv, format=(fourcc)I420";
 
 } // namespace gstPluginWrap
 
-class ColorTuningProperties: public gstPluginWrap::ImagePropertyHolder
-{
+class ColorTuningProperties: public gstPluginWrap::ImagePropertyHolder {
 public:
-	enum Arguments
-	{
-		ARG_CB_EXP = 1,
-		ARG_CR_EXP,
-	};
+    enum Arguments {
+        ARG_CB_EXP = 1,
+        ARG_CR_EXP,
+    };
 
-	static const double defaultCbExp;
-	static const double defaultCrExp;
+    static const double defaultCbExp;
+    static const double defaultCrExp;
 
-	static void getParameters(gstPluginWrap::ParamIdSpecMap& parameters);
+    static void getParameters(gstPluginWrap::ParamIdSpecMap& parameters);
 
-	ColorTuningProperties();
-	virtual ~ColorTuningProperties();
+    ColorTuningProperties();
+    virtual ~ColorTuningProperties();
 
-	bool set(guint id, const GValue* val);
-	bool get(guint id, GValue* val);
+    bool set(guint id, const GValue* val);
+    bool get(guint id, GValue* val);
 
-	double cbExp;
-	double crExp;
+    double cbExp;
+    double crExp;
 };
 
 class ColorTuning:
-	public gstPluginWrap::FrameHandler<ColorTuningProperties>,
-	public gstPluginWrap::PropertyListener
-{
+    public gstPluginWrap::FrameHandler<ColorTuningProperties>,
+    public gstPluginWrap::PropertyListener {
 public:
-	ColorTuning();
-	virtual ~ColorTuning();
+    ColorTuning();
+    virtual ~ColorTuning();
 
-	void propertyChanged(guint id);
+    void propertyChanged(guint id);
 
-	void process(uint8_t* buffer);
+    void process(uint8_t* buffer);
 
 private:
-	void power(uint8_t* lut, int cnt, double e, int mid);
+    void power(uint8_t* lut, int cnt, double e, int mid);
 
-	uint8_t cbLut[256];
-	uint8_t crLut[256];
+    uint8_t cbLut[256];
+    uint8_t crLut[256];
 };
 
 #endif // COLORTUNING_H_

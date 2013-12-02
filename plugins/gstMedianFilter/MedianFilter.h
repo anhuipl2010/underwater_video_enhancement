@@ -8,11 +8,9 @@
 
 #include <gstPluginWrap.h>
 
-namespace gstPluginWrap
-{
+namespace gstPluginWrap {
 
-namespace details
-{
+namespace details {
 const char* name = "medfilt";
 const char* longName = "Median filter";
 const char* classification = "Generic/Filter";
@@ -24,50 +22,46 @@ const char* version = "0.2";
 } // details
 
 const char* allowedCaps = "video/x-raw-yuv, format=(fourcc)I420; "
-	"video/x-raw-rgb, bpp=32, depth=24";
+                          "video/x-raw-rgb, bpp=32, depth=24";
 
 } // namespace gstPluginWrap
 
-class MedianFilterProperties: public gstPluginWrap::ImagePropertyHolder
-{
+class MedianFilterProperties: public gstPluginWrap::ImagePropertyHolder {
 public:
-	enum Arguments
-	{
-		ARG_RADIUS_CH1 = 1,
-		ARG_RADIUS_CH2,
-		ARG_RADIUS_CH3,
-	};
+    enum Arguments {
+        ARG_RADIUS_CH1 = 1,
+        ARG_RADIUS_CH2,
+        ARG_RADIUS_CH3,
+    };
 
-	enum ColorSpace
-	{
-		CS_UNKNOWN,
-		CS_YUV,
-		CS_RGB,
-	};
+    enum ColorSpace {
+        CS_UNKNOWN,
+        CS_YUV,
+        CS_RGB,
+    };
 
-	static const int defaultRadius;
+    static const int defaultRadius;
 
-	static void getParameters(gstPluginWrap::ParamIdSpecMap& parameters);
+    static void getParameters(gstPluginWrap::ParamIdSpecMap& parameters);
 
-	MedianFilterProperties();
-	virtual ~MedianFilterProperties();
+    MedianFilterProperties();
+    virtual ~MedianFilterProperties();
 
-	void setMediaInfo(gchar* mime, GstStructure* params);
+    void setMediaInfo(gchar* mime, GstStructure* params);
 
-	bool set(guint id, const GValue* val);
-	bool get(guint id, GValue* val);
+    bool set(guint id, const GValue* val);
+    bool get(guint id, GValue* val);
 
-	int radius[3];
-	ColorSpace colorSpace;
+    int radius[3];
+    ColorSpace colorSpace;
 };
 
-class MedianFilter: public gstPluginWrap::FrameHandler<MedianFilterProperties>
-{
+class MedianFilter: public gstPluginWrap::FrameHandler<MedianFilterProperties> {
 public:
-	MedianFilter();
-	virtual ~MedianFilter();
+    MedianFilter();
+    virtual ~MedianFilter();
 
-	void process(uint8_t* buffer);
+    void process(uint8_t* buffer);
 };
 
 #endif // MEDIANFILTER_H_
