@@ -13,23 +13,30 @@ void configure(Customizer*& customizer) {
 
 // ColorTuningProperties
 
+const bool ColorTuningProperties::defaultEnabled = true;
 const double ColorTuningProperties::defaultCbExp = 1.0;
 const double ColorTuningProperties::defaultCrExp = 1.0;
 
 void ColorTuningProperties::getParameters(gstPluginWrap::ParamIdSpecMap& parameters) {
+    parameters[ARG_ENABLED] = g_param_spec_boolean(
+        "enabled", "Enabled", "Enable filter.",
+        defaultEnabled, (GParamFlags)G_PARAM_READWRITE);
+
     parameters[ARG_CB_EXP] = g_param_spec_double(
-                                 "cbexp", "cb exponent", "Cb channel exponent",
-                                 0.0, 1.0, defaultCbExp, (GParamFlags)G_PARAM_READWRITE);
+        "cbexp", "cb exponent", "Cb channel exponent",
+        0.0, 1.0, defaultCbExp, (GParamFlags)G_PARAM_READWRITE);
 
     parameters[ARG_CR_EXP] = g_param_spec_double(
-                                 "crexp", "cr exponent", "Cr channel exponent",
-                                 0.0, 1.0, defaultCrExp, (GParamFlags)G_PARAM_READWRITE);
+        "crexp", "cr exponent", "Cr channel exponent",
+        0.0, 1.0, defaultCrExp, (GParamFlags)G_PARAM_READWRITE);
 }
 
 ColorTuningProperties::ColorTuningProperties() {
+    enabled = defaultEnabled;
     cbExp = defaultCbExp;
     crExp = defaultCrExp;
 
+    initialParamIds.insert(ARG_ENABLED);
     initialParamIds.insert(ARG_CB_EXP);
     initialParamIds.insert(ARG_CR_EXP);
 }
@@ -39,6 +46,9 @@ ColorTuningProperties::~ColorTuningProperties() {
 
 bool ColorTuningProperties::set(guint id, const GValue* val) {
     switch (id) {
+    case ARG_ENABLED:
+        enabled = g_value_get_boolean(val);
+        break;
     case ARG_CB_EXP:
         cbExp = g_value_get_double(val);
         break;
@@ -53,6 +63,9 @@ bool ColorTuningProperties::set(guint id, const GValue* val) {
 
 bool ColorTuningProperties::get(guint id, GValue* val) {
     switch (id) {
+    case ARG_ENABLED:
+        g_value_set_boolean(val, enabled);
+        break;
     case ARG_CB_EXP:
         g_value_set_double(val, cbExp);
         break;
@@ -89,6 +102,9 @@ void ColorTuning::propertyChanged(guint id) {
 }
 
 void ColorTuning::process(uint8_t* buffer) {
+    if (!properties->enabled)
+        return;
+
     const int lumLen = properties->bufferWidth * properties->bufferHeight;
 
     const int chromWidth = properties->bufferWidth / 2;

@@ -25,10 +25,12 @@ const char* allowedCaps = "video/x-raw-yuv, format=(fourcc)I420";
 class ColorTuningProperties: public gstPluginWrap::ImagePropertyHolder {
 public:
     enum Arguments {
-        ARG_CB_EXP = 1,
+        ARG_ENABLED = 1,
+        ARG_CB_EXP,
         ARG_CR_EXP,
     };
 
+    static const bool defaultEnabled;
     static const double defaultCbExp;
     static const double defaultCrExp;
 
@@ -40,6 +42,7 @@ public:
     bool set(guint id, const GValue* val);
     bool get(guint id, GValue* val);
 
+    bool enabled;
     double cbExp;
     double crExp;
 };
