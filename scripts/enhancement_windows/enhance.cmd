@@ -61,7 +61,7 @@ goto:eof
     set fn=%~1
     set dir=%~2
 
-    if [%user_out_dir%]==[] (
+    if "%user_out_dir%"=="" (
         set out_dir=%dir%
     ) else (
         set out_dir=%user_out_dir%
@@ -73,7 +73,7 @@ goto:eof
         set out_file_suffix=-enhanced-%enhancement_mode%
     )
 
-    set ret_val=!out_dir!!out_file_prefix!!fn!!out_file_suffix!.mp4
+    set ret_val=!out_dir!\!out_file_prefix!!fn!!out_file_suffix!.mp4
 
     (
         endlocal
