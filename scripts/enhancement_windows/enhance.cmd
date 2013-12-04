@@ -24,7 +24,13 @@ gst-launch-0.10 -e ^
 filesrc location="%in_file:\=/%" ! ^
 decodebin2 ! ^
 videorate ! "video/x-raw-yuv, framerate=%fps%" ! ^
-colortuning enabled=%colortuning_enabled% cbexp=%colortuning_cbexp% crexp=%colortuning_crexp% ! ^
+colortuning enabled=%colortuning_enabled% ^
+cbexp=%colortuning_cbexp% crexp=%colortuning_crexp% ! ^
+medfilt enabled=%medfilt_enabled% ^
+radius1=%medfilt_radius1% radius2=%medfilt_radius2% radius3=%medfilt_radius3% ! ^
+unsharpmask enabled=%unsharpmask_enabled% ^
+radius1=%unsharpmask_radius1% amount1=%unsharpmask_amount1% radius2=%unsharpmask_radius2% ^
+amount2=%unsharpmask_amount2% radius3=%unsharpmask_radius3% amount3=%unsharpmask_amount3% ! ^
 deinterlace %deinterlace_options% ! ^
 x264enc %x264enc_options% ! ^
 mp4mux ! ^
@@ -33,11 +39,13 @@ filesink location="%temp_file:\=/%"
 
 if exist "%temp_file%" (
     for %%a in ("%temp_file%") do set temp_file_size=%%~za
+    echo file size: %temp_file_size%
+    
     if "%temp_file_size%" GTR "0" (
         move /Y "%temp_file%" "%out_file%"
         echo underwater video enhancement completed: from "%in_file%" to "%out_file%"
     ) else (
-        del "%temp_file%"
+        rem del "%temp_file%"
         echo underwater video enhancement failed: "%in_file%" 1>&2
         exit /b 1
     )

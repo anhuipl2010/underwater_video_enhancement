@@ -11,54 +11,64 @@ void configure(Customizer*& customizer) {
 
 // UnsharpMaskProperties
 
+const bool UnsharpMaskProperties::defaultEnabled = true;
 const double UnsharpMaskProperties::defaultRadius = 1.0;
 const double UnsharpMaskProperties::defaultAmount = 0.0;
 
 void UnsharpMaskProperties::getParameters(gstPluginWrap::ParamIdSpecMap& parameters) {
+    parameters[ARG_ENABLED] = g_param_spec_boolean(
+        "enabled",
+        "Enabled",
+        "Enable filter.",
+        defaultEnabled,
+        (GParamFlags)G_PARAM_READWRITE);
+
     parameters[ARG_RADIUS_CH1] = g_param_spec_double(
-                                     "radius1",
-                                     "Radius 1",
-                                     "Gaussian kernel standard deviation for channel 1.",
-                                     DBL_MIN, DBL_MAX, defaultRadius,
-                                     (GParamFlags)G_PARAM_READWRITE);
+        "radius1",
+        "Radius 1",
+        "Gaussian kernel standard deviation for channel 1.",
+        DBL_MIN, DBL_MAX, defaultRadius,
+        (GParamFlags)G_PARAM_READWRITE);
 
     parameters[ARG_AMOUNT_CH1] = g_param_spec_double(
-                                     "amount1",
-                                     "Amount 1",
-                                     "Weight of the sum of original and blurred images for channel 1.",
-                                     0.0, 1.0, defaultAmount,
-                                     (GParamFlags)G_PARAM_READWRITE);
+        "amount1",
+        "Amount 1",
+        "Weight of the sum of original and blurred images for channel 1.",
+        0.0, 1.0, defaultAmount,
+        (GParamFlags)G_PARAM_READWRITE);
 
     parameters[ARG_RADIUS_CH2] = g_param_spec_double(
-                                     "radius2",
-                                     "Radius 2",
-                                     "Gaussian kernel standard deviation for channel 2.",
-                                     DBL_MIN, DBL_MAX, defaultRadius,
-                                     (GParamFlags)G_PARAM_READWRITE);
+        "radius2",
+        "Radius 2",
+        "Gaussian kernel standard deviation for channel 2.",
+        DBL_MIN, DBL_MAX, defaultRadius,
+        (GParamFlags)G_PARAM_READWRITE);
 
     parameters[ARG_AMOUNT_CH2] = g_param_spec_double(
-                                     "amount2",
-                                     "Amount 2",
-                                     "Weight of the sum of original and blurred images for channel 2.",
-                                     0.0, 1.0, defaultAmount,
-                                     (GParamFlags)G_PARAM_READWRITE);
+        "amount2",
+        "Amount 2",
+        "Weight of the sum of original and blurred images for channel 2.",
+        0.0, 1.0, defaultAmount,
+        (GParamFlags)G_PARAM_READWRITE);
 
     parameters[ARG_RADIUS_CH3] = g_param_spec_double(
-                                     "radius3",
-                                     "Radius 3",
-                                     "Gaussian kernel standard deviation for channel 3.",
-                                     DBL_MIN, DBL_MAX, defaultRadius,
-                                     (GParamFlags)G_PARAM_READWRITE);
+        "radius3",
+        "Radius 3",
+        "Gaussian kernel standard deviation for channel 3.",
+        DBL_MIN, DBL_MAX, defaultRadius,
+        (GParamFlags)G_PARAM_READWRITE);
 
     parameters[ARG_AMOUNT_CH3] = g_param_spec_double(
-                                     "amount3",
-                                     "Amount 3",
-                                     "Weight of the sum of original and blurred images for channel 3.",
-                                     0.0, 1.0, defaultAmount,
-                                     (GParamFlags)G_PARAM_READWRITE);
+        "amount3",
+        "Amount 3",
+        "Weight of the sum of original and blurred images for channel 3.",
+        0.0, 1.0, defaultAmount,
+        (GParamFlags)G_PARAM_READWRITE);
 }
 
 UnsharpMaskProperties::UnsharpMaskProperties() {
+    enabled = defaultEnabled;
+
     channels[0].radius = defaultRadius;
     channels[0].amount = defaultAmount;
     channels[1].radius = defaultRadius;
@@ -84,6 +94,9 @@ void UnsharpMaskProperties::setMediaInfo(gchar* mime, GstStructure* params) {
 
 bool UnsharpMaskProperties::set(guint id, const GValue* val) {
     switch (id) {
+    case ARG_ENABLED:
+        enabled = (g_value_get_boolean(val) != 0);
+        break;
     case ARG_RADIUS_CH1:
         channels[0].radius = g_value_get_double(val);
         break;
@@ -110,6 +123,9 @@ bool UnsharpMaskProperties::set(guint id, const GValue* val) {
 
 bool UnsharpMaskProperties::get(guint id, GValue* val) {
     switch (id) {
+    case ARG_ENABLED:
+        g_value_set_boolean(val, enabled);
+        break;
     case ARG_RADIUS_CH1:
         g_value_set_double(val, channels[0].radius);
         break;
@@ -194,6 +210,9 @@ void UnsharpMask::mediaInfoChanged() {
 }
 
 void UnsharpMask::process(uint8_t* buffer) {
+    if (!properties->enabled)
+        return;
+
     for (int i = 0; i < 3; i++) {
         UnsharpMaskProperties::ChannelParam& params = properties->channels[i];
         if (params.amount == 0.0)

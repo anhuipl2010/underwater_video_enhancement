@@ -13,29 +13,37 @@ void configure(Customizer*& customizer) {
 
 // MedianFilterProperties
 
+const bool MedianFilterProperties::defaultEnabled = true;
 const int MedianFilterProperties::defaultRadius = 0;
 
 void MedianFilterProperties::getParameters(gstPluginWrap::ParamIdSpecMap& parameters) {
+    parameters[ARG_ENABLED] = g_param_spec_boolean(
+        "enabled",
+        "Enabled",
+        "Enable filter.",
+        defaultEnabled,
+        (GParamFlags)G_PARAM_READWRITE);
+
     parameters[ARG_RADIUS_CH1] = g_param_spec_int(
-                                     "radius1",
-                                     "Kernel radius 1",
-                                     "Radius of median filter kernel for channel 1",
-                                     0, INT_MAX, defaultRadius,
-                                     (GParamFlags)G_PARAM_READWRITE);
+        "radius1",
+        "Kernel radius 1",
+        "Radius of median filter kernel for channel 1",
+        0, INT_MAX, defaultRadius,
+        (GParamFlags)G_PARAM_READWRITE);
 
     parameters[ARG_RADIUS_CH2] = g_param_spec_int(
-                                     "radius2",
-                                     "Kernel radius 2",
-                                     "Radius of median filter kernel for channel 2",
-                                     0, INT_MAX, defaultRadius,
-                                     (GParamFlags)G_PARAM_READWRITE);
+        "radius2",
+        "Kernel radius 2",
+        "Radius of median filter kernel for channel 2",
+        0, INT_MAX, defaultRadius,
+        (GParamFlags)G_PARAM_READWRITE);
 
     parameters[ARG_RADIUS_CH3] = g_param_spec_int(
-                                     "radius3",
-                                     "Kernel radius 3",
-                                     "Radius of median filter kernel for channel 3",
-                                     0, INT_MAX, defaultRadius,
-                                     (GParamFlags)G_PARAM_READWRITE);
+        "radius3",
+        "Kernel radius 3",
+        "Radius of median filter kernel for channel 3",
+        0, INT_MAX, defaultRadius,
+        (GParamFlags)G_PARAM_READWRITE);
 }
 
 MedianFilterProperties::MedianFilterProperties() {
@@ -47,6 +55,7 @@ MedianFilterProperties::MedianFilterProperties() {
 }
 
 MedianFilterProperties::~MedianFilterProperties() {
+    enabled = defaultEnabled;
 }
 
 void MedianFilterProperties::setMediaInfo(gchar* mime, GstStructure* params) {
@@ -61,6 +70,9 @@ void MedianFilterProperties::setMediaInfo(gchar* mime, GstStructure* params) {
 
 bool MedianFilterProperties::set(guint id, const GValue* val) {
     switch (id) {
+    case ARG_ENABLED:
+        enabled = (g_value_get_boolean(val) != 0);
+        break;
     case ARG_RADIUS_CH1:
         radius[0] = g_value_get_int(val);
         break;
@@ -78,6 +90,9 @@ bool MedianFilterProperties::set(guint id, const GValue* val) {
 
 bool MedianFilterProperties::get(guint id, GValue* val) {
     switch (id) {
+    case ARG_ENABLED:
+        g_value_set_boolean(val, enabled);
+        break;
     case ARG_RADIUS_CH1:
         g_value_set_int(val, radius[0]);
         break;
@@ -102,6 +117,9 @@ MedianFilter::~MedianFilter() {
 }
 
 void MedianFilter::process(uint8_t* buffer) {
+    if (!properties->enabled)
+        return;
+
     cv::Mat ch1, ch2, ch3;
 
     if (properties->colorSpace == MedianFilterProperties::CS_YUV) {

@@ -29,7 +29,8 @@ const char* allowedCaps = "video/x-raw-yuv, format=(fourcc)I420; "
 class UnsharpMaskProperties: public gstPluginWrap::ImagePropertyHolder {
 public:
     enum Arguments {
-        ARG_RADIUS_CH1 = 1,
+        ARG_ENABLED = 1,
+        ARG_RADIUS_CH1,
         ARG_AMOUNT_CH1,
         ARG_RADIUS_CH2,
         ARG_AMOUNT_CH2,
@@ -48,6 +49,7 @@ public:
         double amount;
     };
 
+    static const bool defaultEnabled;
     static const double defaultRadius;
     static const double defaultAmount;
 
@@ -61,6 +63,7 @@ public:
 
     void setMediaInfo(gchar* mime, GstStructure* params);
 
+    bool enabled;
     ChannelParam channels[3];
     ColorSpace colorSpace;
 };

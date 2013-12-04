@@ -29,7 +29,8 @@ const char* allowedCaps = "video/x-raw-yuv, format=(fourcc)I420; "
 class MedianFilterProperties: public gstPluginWrap::ImagePropertyHolder {
 public:
     enum Arguments {
-        ARG_RADIUS_CH1 = 1,
+        ARG_ENABLED = 1,
+        ARG_RADIUS_CH1,
         ARG_RADIUS_CH2,
         ARG_RADIUS_CH3,
     };
@@ -40,6 +41,7 @@ public:
         CS_RGB,
     };
 
+    static const bool defaultEnabled;
     static const int defaultRadius;
 
     static void getParameters(gstPluginWrap::ParamIdSpecMap& parameters);
@@ -52,6 +54,7 @@ public:
     bool set(guint id, const GValue* val);
     bool get(guint id, GValue* val);
 
+    bool enabled;
     int radius[3];
     ColorSpace colorSpace;
 };

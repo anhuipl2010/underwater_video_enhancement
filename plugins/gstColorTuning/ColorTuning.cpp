@@ -36,7 +36,6 @@ ColorTuningProperties::ColorTuningProperties() {
     cbExp = defaultCbExp;
     crExp = defaultCrExp;
 
-    initialParamIds.insert(ARG_ENABLED);
     initialParamIds.insert(ARG_CB_EXP);
     initialParamIds.insert(ARG_CR_EXP);
 }
@@ -47,7 +46,7 @@ ColorTuningProperties::~ColorTuningProperties() {
 bool ColorTuningProperties::set(guint id, const GValue* val) {
     switch (id) {
     case ARG_ENABLED:
-        enabled = g_value_get_boolean(val);
+        enabled = (g_value_get_boolean(val) != 0);
         break;
     case ARG_CB_EXP:
         cbExp = g_value_get_double(val);
