@@ -4,6 +4,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <iostream>
+#include <sstream>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -18,6 +19,12 @@ void getFiles(const std::string& directory, const std::string& pattern,
 void getFiles(const std::vector<std::string>& directories, const std::string& pattern,
               std::vector<std::string>& files) {
     const std::string pathSep = "/"; // OK for Windows too
+
+    std::vector<std::string> subPatterns;
+    std::stringstream iss(pattern);
+    std::string item;
+    while (std::getline(iss, item, '|'))
+        subPatterns.push_back(item);
 
     std::deque<std::string> dirs(directories.begin(), directories.end());
     while (!dirs.empty()) {
@@ -41,8 +48,11 @@ void getFiles(const std::vector<std::string>& directories, const std::string& pa
                 if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
                     dirs.push_back(path);
             } else {
-                if (matchWildcard(pattern.c_str(), entry->d_name))
-                    files.push_back(path);
+                for (std::vector<std::string>::iterator it = subPatterns.begin(),
+                        end = subPatterns.end(); it != end; ++it) {
+                    if (matchWildcard(it->c_str(), entry->d_name))
+                        files.push_back(path);
+                }
             }
         }
 

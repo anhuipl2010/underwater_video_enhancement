@@ -56,7 +56,7 @@ if "%temp_file_size%" == "0" (
     exit /b 1
 )
 
-move /Y "%temp_file%" "%out_file%"
+move /y "%temp_file%" "%out_file%"
 
 echo Underwater video enhancement completed: from "%in_file%" to "%out_file%"
 exit /b 0
