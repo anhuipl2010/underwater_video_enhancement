@@ -1,6 +1,6 @@
 @rem Enhancement parameters
 
-rem Default
+rem Defaults
 set colortuning_cbexp=1.0
 set colortuning_crexp=1.0
 set medfilt_radius1=0
@@ -14,14 +14,14 @@ set unsharpmask_radius3=0.1
 set unsharpmask_amount3=0.0
 
 rem Original
-if %enhancement_mode%==0_0 (
+if "%enhancement_mode%" == "0_0" (
     set colortuning_enabled=false
     set medfilt_enabled=false
     set unsharpmask_enabled=false
 )
 
 rem Weak filtering
-if %enhancement_mode%==0_1 (
+if "%enhancement_mode%" == "0_1" (
     set medfilt_radius1=2
     set medfilt_radius2=1
     set medfilt_radius3=1
@@ -39,7 +39,7 @@ if %enhancement_mode%==0_1 (
 )
 
 rem Strong filtering
-if %enhancement_mode%==0_2 (
+if "%enhancement_mode%" == "0_2" (
     set medfilt_radius1=3
     set medfilt_radius2=2
     set medfilt_radius3=2
@@ -57,7 +57,7 @@ if %enhancement_mode%==0_2 (
 )
 
 rem Color correction
-if %enhancement_mode%==1_0 (
+if "%enhancement_mode%" == "1_0" (
     set colortuning_cbexp=0.8
     set colortuning_crexp=0.8
 
@@ -67,7 +67,7 @@ if %enhancement_mode%==1_0 (
 )
 
 rem Color correction and weak filtering
-if %enhancement_mode%==1_1 (
+if "%enhancement_mode%" == "1_1" (
     set colortuning_cbexp=0.8
     set colortuning_crexp=0.8
 
@@ -88,7 +88,7 @@ if %enhancement_mode%==1_1 (
 )
 
 rem Color correction and strong filtering
-if %enhancement_mode%==1_2 (
+if "%enhancement_mode%" == "1_2" (
     set colortuning_cbexp=0.8
     set colortuning_crexp=0.8
 
