@@ -22,11 +22,10 @@ set out_file_prefix=
 
 set run_script_dir=%~dp0
 
-call set PATH=%%PATH:%run_script_dir%..\bin;=%%
-set PATH=%run_script_dir%..\bin;%PATH%
-
 call %run_script_dir%..\plugins\setpath.cmd
 call %run_script_dir%..\plugins\setenv.cmd
+
+call set PATH=%run_script_dir%bin;%%PATH:%run_script_dir%bin;=%%
 
 set batchrun=%run_script_dir%..\batchrun\bin\release\batchrun.exe
 
