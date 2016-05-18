@@ -25,7 +25,7 @@
 namespace gstPluginWrap {
 
 /**
- * Abstract class for frame processing inside GStreamer plug-in.
+ * Abstract class for frame processing inside GStreamer plugin.
  */
 class PureFrameHandler {
 public:

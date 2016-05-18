@@ -1,4 +1,4 @@
-# Color tuning GStreamer plug-in
+# Color tuning GStreamer plugin
 
 mode = shared_obj
 

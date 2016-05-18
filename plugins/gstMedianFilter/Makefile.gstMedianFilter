@@ -1,4 +1,4 @@
-# Median filter GStreamer plug-in
+# Median filter GStreamer plugin
 
 mode = shared_obj
 

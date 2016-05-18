@@ -1,4 +1,4 @@
-# FPS counter GStreamer plug-in
+# FPS counter GStreamer plugin
 
 mode = shared_obj
 

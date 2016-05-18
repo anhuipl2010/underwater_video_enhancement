@@ -1,6 +1,6 @@
-gstFpsCount is a GStreamer plug-in that prints to stdout amount of frames per second for the running pipeline.
+gstFpsCount is a GStreamer plugin that prints to stdout amount of frames per second for the running pipeline.
 
 Dependencies:
 	gstreamer-0.10: http://gstreamer.com/ (OSSBuild for Windows: https://code.google.com/p/ossbuild/)
-	gstPluginWrap: https://github.com/vchernov/gstAssist
+	gstPluginWrap: https://github.com/vchernov/gstassist
 	timeutil: https://github.com/vchernov/timeutil

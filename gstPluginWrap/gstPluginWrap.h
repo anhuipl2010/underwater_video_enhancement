@@ -21,7 +21,7 @@
  * Note!
  * The GST_PLUGIN_TYPE macro must be defined before inclusion of this file.
  * It is used as a name of the structure that represents GStreamer element type.
- * The defined name have to be unique among plug-ins installed in the system.
+ * The defined name have to be unique among plugins installed in the system.
  *
  * example:
  * #define GST_PLUGIN_TYPE GstMyPluginName
@@ -107,7 +107,7 @@ private:
 Customizer* Customizer::instance = NULL;
 
 /**
- * Plug-in with frame handling.
+ * Plugin with frame handling.
  */
 template<class HandlerT>
 class HandlerCustomizer: public Customizer {
@@ -120,7 +120,7 @@ public:
 };
 
 /**
- * Plug-in with frame handling and properties.
+ * Plugin with frame handling and properties.
  */
 template<class HandlerT, class PropT>
 class HandlerAndPropCustomizer: public HandlerCustomizer<HandlerT> {
@@ -141,7 +141,7 @@ public:
 };
 
 /**
- * Plug-in with frame handling and properties bounded by listener.
+ * Plugin with frame handling and properties bounded by listener.
  */
 template<class HandlerT, class PropT>
 class HandlerAndPropWithListenerCustomizer: public HandlerCustomizer<HandlerT> {
@@ -221,7 +221,7 @@ GType gst_thisplugin_get_type();
 G_END_DECLS // end C code
 
 /*
- * The _finalize() function is called when the plug-in is destroyed.
+ * The _finalize() function is called when the plugin is destroyed.
  */
 static void gst_thisplugin_finalize(GObject* pluginObj);
 
@@ -275,9 +275,9 @@ static GstStaticPadTemplate srcTemplate = GST_STATIC_PAD_TEMPLATE(
         );
 
 /*
- * The plugin_init() function is called as soon as the plug-in is loaded.
+ * The plugin_init() function is called as soon as the plugin is loaded.
  * It should return TRUE or FALSE depending on whether it is loaded correctly or not.
- * In this function, any supported element type in the plug-in should be registered.
+ * In this function, any supported element type in the plugin should be registered.
  */
 static gboolean plugin_init(GstPlugin* gstPlugin) {
     using namespace gstPluginWrap;
@@ -351,7 +351,7 @@ static void gst_thisplugin_class_init(GST_PLUGIN_TYPE_CLASS* pluginClass) {
 }
 
 /*
- * The _init() function is used to initialize a specific instance of the plug-in type.
+ * The _init() function is used to initialize a specific instance of the plugin type.
  */
 static void gst_thisplugin_init(GST_PLUGIN_TYPE* plugin, GST_PLUGIN_TYPE_CLASS* pluginClass) {
     using namespace gstPluginWrap;

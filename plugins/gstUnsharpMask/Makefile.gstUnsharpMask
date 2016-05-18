@@ -1,4 +1,4 @@
-# Unsharp mask GStreamer plug-in
+# Unsharp mask GStreamer plugin
 
 mode = shared_obj
 

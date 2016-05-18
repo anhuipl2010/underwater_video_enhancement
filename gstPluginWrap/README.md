@@ -1,7 +1,7 @@
 gstPluginWrap
 =============
 
-GStreamer plug-in wrapper. Header only C++ library. Provides simple object-oriented way for plug-ins writing.
+GStreamer plugin wrapper. Header only C++ library. Provides simple object-oriented way for plugin writing.
 
 
 Dependencies
@@ -13,7 +13,7 @@ Dependencies
 Resources
 ---------
 
-* Source Code: [https://github.com/vchernov/gstAssist](https://github.com/vchernov/gstAssist)
+* Source Code: [https://github.com/vchernov/gstassist](https://github.com/vchernov/gstassist)
 
 
 Copying
