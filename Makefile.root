@@ -1,6 +1,6 @@
 # Makefile for C++ projects
 # Author: Vladimir Chernov <2chernov@gmail.com>
-# Last modification date: 15.05.2013
+# Last modification date: 19.05.2016
 
 compiler ?= g++
 linker ?= g++
@@ -17,7 +17,7 @@ mode ?= exe
 PACKAGE = $(shell basename $(shell pwd))
 
 # platform
-PLATFORM = $(shell uname -s)
+PLATFORM = $(shell gcc -dumpmachine)
 
 # debug configuration flags
 ifeq ($(cfg), debug)
@@ -32,11 +32,8 @@ ifeq ($(cfg), release)
 	CPPFLAGS ?= -DNDEBUG
 endif
 
-# Windows MinGW identifier
-ifeq ($(PLATFORM), MINGW32_NT-5.1)
-	WIN32 = yes
-endif
-ifeq ($(PLATFORM), MINGW32_NT-6.1)
+# Windows identifier
+ifeq ($(OS), Windows_NT)
 	WIN32 = yes
 endif
 
