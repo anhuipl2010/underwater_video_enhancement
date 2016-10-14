@@ -1,6 +1,0 @@
-Name: gstPluginWrap
-Description: C++ wrapper for GStreamer plugin development
-Requires: gstreamer-0.10
-Version: $VERSION
-Libs:
-Cflags: -I$CUR_DIR
